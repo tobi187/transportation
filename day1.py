@@ -3,27 +3,27 @@ import os
 
 countdown = 60
 
-if os.stat("time_left.txt").st_size == 0:
-    countdown = open("time_left.txt", "r")
-
+if os.stat("time_left.txt").st_size != 0:
+    save_rest = open("time_left.txt", "r")
+    countdown = int(save_rest.readline())
 
 try:
     for i in range(countdown):
-        time.sleep(1)
         print(countdown)
-        countdown = countdown - 1
+        countdown -= 1
+        time.sleep(60)
 
     print("")
     print("You're done")
-    with open("time.txt", "w") as f:
-        f.truncate()
+    delete_rest = open("time_left.txt", "w")
+    delete_rest.truncate()
 
 except KeyboardInterrupt:
     print("")
     print(f"You still have {countdown} minutes to go")
-    with open("time_left.txt", "w") as f:
-        f.write(countdown)
-
+    save_rest = open("time_left.txt", "w")
+    save_rest.write(str(countdown))
+    save_rest.close()
 
 
 
