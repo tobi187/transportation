@@ -19,6 +19,7 @@ try:
     delete_rest.truncate()
 
 except KeyboardInterrupt:
+    countdown += 1
     print("")
     print(f"You still have {countdown} minutes to go")
     save_rest = open("time_left.txt", "w")
