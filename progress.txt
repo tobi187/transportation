@@ -1,0 +1,69 @@
+[
+    {
+        "date": "2021-01-26",
+        "key": 1,
+        "time_coded": 1,
+        "time_videos": 1
+    },
+    {
+        "date": "2021-01-27",
+        "key": 2,
+        "time_coded": 1,
+        "time_videos": 1
+    },
+    {
+        "date": "2021-01-28",
+        "key": 3,
+        "time_coded": 1,
+        "time_videos": 1
+    },
+    {
+        "date": "2021-01-29",
+        "key": 4,
+        "time_coded": 1,
+        "time_videos": 1
+    },
+    {
+        "date": "2021-01-30",
+        "key": 5,
+        "time_coded": 1,
+        "time_videos": 1
+    },
+    {
+        "date": "2021-01-31",
+        "key": 6,
+        "time_coded": 1,
+        "time_videos": 1
+    },
+    {
+        "date": "2021-02-01",
+        "key": 7,
+        "notes": [
+            "startet with this progress tracking programm"
+        ],
+        "time_coded": "2",
+        "time_videos": "0"
+    },
+    {
+        "date": "2021-02-02",
+        "key": 8,
+        "time_coded": 1,
+        "time_videos": 1
+    },
+    {
+        "date": "2021-02-03",
+        "key": 9,
+        "time_coded": 1,
+        "time_videos": 1
+    },
+    {
+        "date": "2021-02-04",
+        "key": 10,
+        "notes": [
+            "now im sure",
+            "oh shit im bad at english"
+        ],
+        "time_coded": 1,
+        "time_videos": 1
+    }
+]
