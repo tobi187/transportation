@@ -1,8 +1,9 @@
 import json
 import sys
 from datetime import date
+import pprint
 
-with open("text.txt", "r") as fr:
+with open("progress.txt", "r") as fr:
     days = json.load(fr)
 
 help_menu = """
@@ -65,9 +66,14 @@ if len(sys.argv) == 3:
                 continue
     # print one day
     elif sys.argv[1] == "-g":
+        if sys.argv[2] == "today":
+            pprint.pprint(days[-1])
+            # print(days[-1])
         for i in days:
             if i["date"] == sys.argv[2]:
-                print(i)
+                pprint.pprint(i)
+                # print(i)
+
 
 # add more than one notes to other day
 if len(sys.argv) == 4:
@@ -84,6 +90,11 @@ if len(sys.argv) == 4:
 if len(sys.argv) > 3:
     if sys.argv[1] == "-l":
         for i in days:
+            if sys.argv[2] == "today":
+                if "link" not in i:
+                    i["link"] = []
+                for j in range(3, len(sys.argv)):
+                    i["link"].append(sys.argv[j])
             if i["date"] == sys.argv[2]:
                 if "link" not in i:
                     i["link"] = []

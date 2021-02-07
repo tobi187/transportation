@@ -3,37 +3,55 @@
         "date": "2021-01-26",
         "key": 1,
         "time_coded": 1,
-        "time_videos": 1
+        "time_videos": 1,
+        "link": [
+            "/home/tobi/projects/100daysofcode/main.py"
+        ]
     },
     {
         "date": "2021-01-27",
         "key": 2,
         "time_coded": 1,
-        "time_videos": 1
+        "time_videos": 1,
+        "link": [
+            "/home/tobi/projects/100daysofcode/main.py"
+        ]
     },
     {
         "date": "2021-01-28",
         "key": 3,
         "time_coded": 1,
-        "time_videos": 1
+        "time_videos": 1,
+        "link": [
+            "/home/tobi/projects/100daysofcode/main.py"
+        ]
     },
     {
         "date": "2021-01-29",
         "key": 4,
         "time_coded": 1,
-        "time_videos": 1
+        "time_videos": 1,
+        "link": [
+            "/home/tobi/projects/100daysofcode/main.py"
+        ]
     },
     {
         "date": "2021-01-30",
         "key": 5,
         "time_coded": 1,
-        "time_videos": 1
+        "time_videos": 1,
+        "link": [
+            "/home/tobi/projects/100daysofcode/main.py"
+        ]
     },
     {
         "date": "2021-01-31",
         "key": 6,
         "time_coded": 1,
-        "time_videos": 1
+        "time_videos": 1,
+        "link": [
+            "/home/tobi/projects/100daysofcode/main.py"
+        ]
     },
     {
         "date": "2021-02-01",
@@ -42,19 +60,28 @@
             "startet with this progress tracking programm"
         ],
         "time_coded": "2",
-        "time_videos": "0"
+        "time_videos": "0",
+        "link": [
+            "/home/tobi/projects/100daysofcode/main.py"
+        ]
     },
     {
         "date": "2021-02-02",
         "key": 8,
         "time_coded": 1,
-        "time_videos": 1
+        "time_videos": 1,
+        "link": [
+            "/home/tobi/projects/100daysofcode/main.py"
+        ]
     },
     {
         "date": "2021-02-03",
         "key": 9,
         "time_coded": 1,
-        "time_videos": 1
+        "time_videos": 1,
+        "link": [
+            "/home/tobi/projects/100daysofcode/main.py"
+        ]
     },
     {
         "date": "2021-02-04",
@@ -64,7 +91,10 @@
             "oh shit im bad at english"
         ],
         "time_coded": 1,
-        "time_videos": 1
+        "time_videos": 1,
+        "link": [
+            "/home/tobi/projects/100daysofcode/main.py"
+        ]
     },
     {
         "date": "2021-02-05",
@@ -74,7 +104,10 @@
             "oh shit im bad at english"
         ],
         "time_coded": 1,
-        "time_videos": 1
+        "time_videos": 1,
+        "link": [
+            "/home/tobi/projects/100daysofcode/main.py"
+        ]
     },
     {
         "key": 12,
@@ -83,6 +116,22 @@
         "time_videos": 1,
         "notes": [
             "Added ubuntu as os alonside windows and started setting it up"
+        ],
+        "link": [
+            "/home/tobi/projects/100daysofcode/main.py"
+        ]
+    },
+    {
+        "key": 13,
+        "date": "2021-02-07",
+        "time_coded": 1,
+        "time_videos": 1,
+        "note": [
+            "finally managed to complete the coffee machine project",
+            "installed zorin os(i think) on moms laptop, pop os on my own laptop and upgraded laptop od my dad to ubuntu 20.04"
+        ],
+        "link": [
+            "/home/tobi/projects/100daysofcode/main.py"
         ]
     }
 ]
