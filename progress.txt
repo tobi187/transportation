@@ -65,5 +65,24 @@
         ],
         "time_coded": 1,
         "time_videos": 1
+    },
+    {
+        "date": "2021-02-05",
+        "key": 11,
+        "notes": [
+            "now im sure",
+            "oh shit im bad at english"
+        ],
+        "time_coded": 1,
+        "time_videos": 1
+    },
+    {
+        "key": 12,
+        "date": "2021-02-06",
+        "time_coded": 1,
+        "time_videos": 1,
+        "notes": [
+            "Added ubuntu as os alonside windows and started setting it up"
+        ]
     }
 ]

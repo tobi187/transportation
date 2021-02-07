@@ -2,7 +2,7 @@ import json
 import sys
 from datetime import date
 
-with open("text.txt", "r") as fr:
+with open("progress.txt", "r") as fr:
     days = json.load(fr)
 
 help_menu = """
@@ -65,6 +65,8 @@ if len(sys.argv) == 3:
                 continue
     # print one day
     elif sys.argv[1] == "-g":
+        if sys.argv[2] == "today":
+            print(days[-1])
         for i in days:
             if i["date"] == sys.argv[2]:
                 print(i)
