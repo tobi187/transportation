@@ -3,7 +3,7 @@ import sys
 from datetime import date
 import pprint
 
-with open("progress.txt", "r") as fr:
+with open("/home/tobi/projects/transportation/progress.txt", "r") as fr:
     days = json.load(fr)
 
 help_menu = """
@@ -28,6 +28,8 @@ examples:
     track_progress.py -l 2021-01-31 /home/kali/ransom/walz https://github.com/tobi187
     -> add links to 31 of January
 """
+
+p = pprint.PrettyPrinter(indent=4, sort_dicts=False)
 
 # add 1 note to current day
 if len(sys.argv) == 2:
@@ -67,11 +69,11 @@ if len(sys.argv) == 3:
     # print one day
     elif sys.argv[1] == "-g":
         if sys.argv[2] == "today":
-            pprint.pprint(days[-1])
+            p.pprint(days[-1])
             # print(days[-1])
         for i in days:
             if i["date"] == sys.argv[2]:
-                pprint.pprint(i)
+                p.pprint(i)
                 # print(i)
 
 
@@ -95,7 +97,7 @@ if len(sys.argv) > 3:
                     i["link"] = []
                 for j in range(3, len(sys.argv)):
                     i["link"].append(sys.argv[j])
-            if i["date"] == sys.argv[2]:
+            elif i["date"] == sys.argv[2]:
                 if "link" not in i:
                     i["link"] = []
                 for j in range(3, len(sys.argv)):
@@ -130,5 +132,5 @@ if len(sys.argv) == 1:
 
     days.append(new_item)
 
-with open("progress.txt", "w") as fw:
+with open("/home/tobi/projects/transportation/progress.txt", "w") as fw:
     json.dump(days, fw, indent=4)
