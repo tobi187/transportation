@@ -1,26 +1,20 @@
 from openpyxl import Workbook, load_workbook
 import datetime
 import subprocess
+import holidays
 
+# file stuff -> copy file, open copy and open with openpyxl
 file_name = "Leistungsbericht"
-
 # subprocess.run(["cp", file_name, file_name+"_fertig.xlsx"])
-
 wb = load_workbook(filename=file_name+".xlsx", data_only=True)
 
-sheet = wb[wb.sheetnames[0]]
+# for sheet in wb:
+#     active_sheet = wb[sheet]
+current_sheet = wb[wb.sheetnames[0]]
 
-max_row = sheet.max_row
-
-total_time = datetime.timedelta(hours=0, minutes=0, seconds=0)
-
-total_time_single_day = datetime.timedelta(hours=0, minutes=0, seconds=0)
-
-last_date = datetime.datetime(year=2000, month=1, day=1)
-
+# declare variables we need
 threshold_time = datetime.timedelta(hours=8, minutes=0, seconds=0)
-
-can_still_work = True
+german_holidays = holidays.Germany(prov="BW", years=[2020, 2021, 2022])
 
 
 def check_time_limit_multiple_days(curr_time, new_day):
@@ -32,44 +26,49 @@ def check_time_limit_multiple_days(curr_time, new_day):
         return new_day, True
 
 
-def check_multiple_days(active_sheet, index, date):
-    for date_cell in range(index + 4, max_row + 1):
-        if date == active_sheet.cell(row=i, )
+def calculate_one_month(active_sheet):
+    max_row = active_sheet.max_row
+    time_multiple_days = datetime.timedelta(hours=0, minutes=0, seconds=0)
+    total_time_month = datetime.timedelta(hours=0, minutes=0, seconds=0)
+    last_date = datetime.datetime(year=2000, month=1, day=1)
+    can_still_work = True
+    rows_to_delete = []
 
+    for row in range(4, max_row + 1):
+        curr_cell_time = active_sheet.cell(row=row, column=6).value
+        curr_cell_date = active_sheet.cell(row=row, column=1).value
+        last_date = active_sheet.cell(row=row - 1, column=1).value
+    
+        if curr_cell_time is not None:
+            time_worked_day = curr_cell_time
 
-for i in range(4, max_row + 1):
-    curr_cell_time = sheet.cell(row=i, column=6).value
-    curr_cell_date = sheet.cell(row=i, column=1).value
-    last_date = sheet.cell(row=i-1, column=1).value
+            # check if sunday or holiday
+            if curr_cell_date.weekday() == 6 or curr_cell_date in german_holidays:
+                curr_cell_time = datetime.timedelta(hours=0, minutes=0, seconds=0)
+                continue
 
-    if curr_cell_time is not None:
-        total_time = curr_cell_time
-        print(curr_cell_time)
+            # check if multiple days and limit(8hours) is reached
+            if last_date == curr_cell_date and not can_still_work:
+                rows_to_delete.insert(0, row)
+                continue
+            else:
+                can_still_work = True
 
-        # check if sunday
-        if curr_cell_date.weekday() == 6:
-            curr_cell_time = datetime.timedelta(hours=0, minutes=0, seconds=0)
-            continue
+            # check multiple days
+            if last_date == curr_cell_date:
+                time_worked_day, can_still_work = check_time_limit_multiple_days(time_multiple_days, curr_cell_time)
+                time_multiple_days += time_worked_day
+            else:
+                time_multiple_days = datetime.timedelta(hours=0, minutes=0, seconds=0)
 
-        # check if multiple days and limit(8hours) is reached
-        if last_date == curr_cell_date and not can_still_work:
-            # zelle löschen bzw ganze zeile
-            sheet.delete_rows(i)
-            print(total_time, curr_cell_time, curr_cell_date)
-            continue
-        else:
-            can_still_work = True
+            # check if limit is reached
+            if curr_cell_time > datetime.timedelta(hours=8, minutes=0, seconds=0):
+                time_worked_day = datetime.timedelta(hours=8, minutes=0, seconds=0)
 
-        # check multiple days
-        if last_date == curr_cell_date:
-            time_worked, can_still_work = check_time_limit_multiple_days(total_time_single_day, curr_cell_time)
-        else:
-            total_time_single_day = datetime.timedelta(hours=0, minutes=0, seconds=0)
+            curr_cell_time = time_worked_day
+            total_time_month += time_worked_day
 
-        # check if limit is reached
-        if curr_cell_time > datetime.timedelta(hours=8, minutes=0, seconds=0):
-            total_time = datetime.timedelta(hours=8, minutes=0, seconds=0)
-
-
+    for row in rows_to_delete:
+        active_sheet.delete_rows(row)
 
 
