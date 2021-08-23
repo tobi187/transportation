@@ -1,6 +1,8 @@
 import numpy as np
 
-with open("maze.txt", "r") as file:
+maze_loc = input("Give me the file name: ")
+
+with open(str(maze_loc)+".txt", "r") as file:
     array_2D = [line.strip() for line in file]
     new_array = [list(line) for line in array_2D]
     longest = len(max(new_array, key=len))
@@ -15,11 +17,14 @@ maze = np.array(same_length_array)
 
 def check_bounds(loc):
     bounds = np.shape(maze)
-    print(bounds, loc)
-    if 0 > loc[0] >= bounds[0] or 0 > loc[1] >= bounds[1]:
-        return False
-    else:
+    # if 0 > loc[0] >= bounds[0] or 0 > loc[1] >= bounds[1]:
+    #     return False
+    # else:
+    #     return True
+    if 0 <= loc[0] < bounds[0] and 0 <= loc[1] < bounds[1]:
         return True
+    else:
+        return False
 
 
 def move(loc, heading):
@@ -80,4 +85,6 @@ while curr_loc != endpoint:
 
     all_locations.append(curr_loc)
 
-print(all_locations)
+print(f"Way: {all_locations}")
+print(endpoint)
+print(curr_loc)
