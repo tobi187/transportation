@@ -12,11 +12,16 @@ import holidays
 #     file_name = str(get_file_name)
 
 file_name = "Leistungsbericht"
-limit = 8
+operation = "w"
 
 wb = load_workbook(filename=file_name + ".xlsx", data_only=True)
 
+# declare variables we need
+threshold_time = datetime.timedelta(hours=8, minutes=0, seconds=0)
+german_holidays = holidays.Germany(prov="BW", years=[2020, 2021, 2022])
 
+
+# if more than 1 entry for a day check how much and handle them different
 def calculate_multiple_times(start_index, curr_sheet, start_date):
     skip_index = []
     for row in range(start_index, 10000):
@@ -26,11 +31,7 @@ def calculate_multiple_times(start_index, curr_sheet, start_date):
             return skip_index, True
 
 
-# declare variables we need
-threshold_time = datetime.timedelta(hours=limit, minutes=0, seconds=0)
-german_holidays = holidays.Germany(prov="BW", years=[2020, 2021, 2022])
-
-
+# calculate multiple entries for one day
 def check_time_limit_multiple_days(curr_time, new_day):
     if new_day > threshold_time:
         return threshold_time - curr_time + datetime.timedelta(hours=0, minutes=30, seconds=0), False
@@ -45,6 +46,8 @@ def check_time_limit_multiple_days(curr_time, new_day):
 def calculate_one_month(active_sheet):
 
     delete_empty_rows = []
+
+    # check for empty rows and delete them
     for row in range(5, 50):
         if active_sheet.cell(row=row, column=1).value is None and active_sheet.cell(row=row, column=8).value is None:
             delete_empty_rows.insert(0, row)
@@ -52,6 +55,7 @@ def calculate_one_month(active_sheet):
     for row_to_delete in delete_empty_rows:
         active_sheet.delete_rows(row_to_delete)
 
+    # declare variables we need
     max_row = active_sheet.max_row
     time_multiple_days = datetime.timedelta(hours=0, minutes=0, seconds=0)
     real_time_month = datetime.timedelta(hours=0, minutes=0, seconds=0)
@@ -60,10 +64,12 @@ def calculate_one_month(active_sheet):
     rows_to_delete = []
     skip_rows = []
 
+    # loop through rows in the excel sheet
     for row in range(4, max_row + 1):
         curr_cell_time = active_sheet.cell(row=row, column=6).value
         curr_cell_date = active_sheet.cell(row=row, column=1).value
         next_day = active_sheet.cell(row=row + 1, column=1).value
+
         if next_day is None:
             next_day = datetime.datetime(year=2000, month=1, day=1)
 
@@ -82,6 +88,7 @@ def calculate_one_month(active_sheet):
             if curr_cell_date == next_day and not multiple_days_active:
                 skip_rows, multiple_days_active = calculate_multiple_times(row, active_sheet, curr_cell_date)
 
+            # the calculation if multiple entries for one day
             if row in skip_rows:
                 if not can_still_work:
                     rows_to_delete.insert(0, row)
@@ -100,45 +107,62 @@ def calculate_one_month(active_sheet):
                     time_multiple_days = datetime.timedelta(hours=0, minutes=0, seconds=0)
 
                 continue
-            # check if multiple days and limit(8hours) is reached
-            # if next_day == curr_cell_date and not can_still_work or last_day == curr_cell_date and not can_still_work:
-            #     rows_to_delete.insert(0, row)
-            #     continue
-            # else:
-            #     can_still_work = True
-            #
-            # # check multiple days
-            # if next_day == curr_cell_date or last_day == curr_cell_date:
-            #     time_worked_day, can_still_work = check_time_limit_multiple_days(time_multiple_days, time_worked_day)
-            #     time_multiple_days += time_worked_day
-            # else:
-            #     time_multiple_days = datetime.timedelta(hours=0, minutes=0, seconds=0)
 
             # check if limit is reached
             if curr_cell_time > threshold_time:
-                # print(active_sheet.cell(row=row, column=4).value, type(active_sheet.cell(row=row, column=4).value))
+
                 additional_pause_time = datetime.timedelta(hours=0, minutes=0, seconds=0)
-                if int(active_sheet.cell(row=row, column=4).value[3:]) > 30 and limit <= 8:
+
+                # if pause 45 min remove 15, bec otherwise new calced time is too high
+                if int(active_sheet.cell(row=row, column=4).value[3:]) > 30:
                     additional_pause_time = datetime.timedelta(hours=0, minutes=15, seconds=0)
+
                 excessive_time = time_worked_day - threshold_time
                 active_sheet.cell(row=row, column=3).value = leave_time - excessive_time - additional_pause_time
 
-            # active_sheet.cell(row=row, column=6).value = time_worked_day
-
+    # delete rows with multiple entries for one day if limit is reached
     for row in rows_to_delete:
         active_sheet.delete_rows(row)
 
-    for row in range(4, 50):
-        active_sheet.cell(row=row, column=6).value = f"=C{row}-B{row}-D{row}-E{row}"
-        active_sheet.cell(row=row,
-                          column=4).value = f'=IF(C{row}-B{row}>$H$4,"00:45",IF(C{row}-B{row}>$H$5,"00:30",IF(C{row}-B{row}<=$H$5,"00:00")))'
-
+    # add all constant fields in case they got removed
     active_sheet.cell(row=5, column=7).value = real_time_month
     active_sheet.cell(row=4, column=7).value = "=SUM(F4:F33)"
     active_sheet["G26"] = "Gesamt"
     active_sheet["G28"] = "Unterschrift Arbeitgeber:"
 
+    # calc time for werkstudent (add 20 hours weeklimit)
+    if operation == "w":
+        time_tank = datetime.timedelta()
+        curr_week = 0
 
+        for row in range(4, 60):
+            curr_date = active_sheet.cell(row=row, column=1).value
+
+            if curr_date is None:
+                break
+
+            # if new week starts reset time and update week
+            if curr_date.isocalendar()[1] != curr_week:
+                # time_tank = datetime.timedelta()
+                curr_week = curr_date.isocalendar()[1]
+                time_tank = active_sheet.cell(row=row, column=6).value
+
+            elif datetime.timedelta(hours=2) <= time_tank <= datetime.timedelta(hours=8):
+                if curr_date.isocalendar()[1] == curr_week:
+                    active_sheet.cell(row=row, column=3).value = active_sheet.cell(row=row, column=2).value + time_tank
+                    time_tank += active_sheet.cell(row=row, column=6).value
+                    
+            elif time_tank < datetime.timedelta(hours=2):
+                active_sheet.cell(row=row, column=6).value = datetime.timedelta()
+
+    # add formulas again
+    for row in range(4, 50):
+        active_sheet.cell(row=row, column=6).value = f"=C{row}-B{row}-D{row}-E{row}"
+        active_sheet.cell(row=row,
+                          column=4).value = f'=IF(C{row}-B{row}>$H$4,"00:45",IF(C{row}-B{row}>$H$5,"00:30",IF(C{row}-B{row}<=$H$5,"00:00")))'
+
+
+# loop through each sheet
 for index, sheet in enumerate(wb.worksheets):
     calculate_one_month(sheet)
     print(f"{index + 1} von {len(wb.worksheets)}: Done")
