@@ -3,16 +3,16 @@ import datetime
 import holidays
 
 # file stuff -> copy file, open copy and open with openpyxl
-# get_file_name = input("Name des Excelsheets eingeben (ohne .xlsx). Falls der Name 'Leistungsbericht' ist gib einfach y ein> ")
-# limit = int(input("Gib das tägliche Arbeitszeitlimit an (nur ganze zahl z.B. 8)> "))
-#
-# if str(get_file_name).lower() == "y":
-#     file_name = "Leistungsbericht"
-# else:
-#     file_name = str(get_file_name)
+get_file_name = input("Name des Excelsheets eingeben (ohne .xlsx). Falls der Name 'Leistungsbericht' ist gib einfach y ein> ")
+operation = input("Werkstudent oder Vollzeitkraft (w oder v)> ")
 
-file_name = "Leistungsbericht"
-operation = "w"
+if str(get_file_name).lower() == "y":
+    file_name = "Leistungsbericht"
+else:
+    file_name = str(get_file_name)
+
+# file_name = "Leistungsbericht"
+# operation = "w"
 
 wb = load_workbook(filename=file_name + ".xlsx", data_only=True)
 
@@ -43,7 +43,11 @@ def check_time_limit_multiple_days(curr_time, new_day):
         return new_day, True
 
 
-def calculate_one_month(active_sheet):
+week_time = datetime.timedelta()
+week_nr = 0
+
+
+def calculate_one_month(active_sheet, curr_week, time_tank):
 
     delete_empty_rows = []
 
@@ -132,8 +136,6 @@ def calculate_one_month(active_sheet):
 
     # calc time for werkstudent (add 20 hours weeklimit)
     if operation == "w":
-        time_tank = datetime.timedelta()
-        curr_week = 0
 
         for row in range(4, 60):
             curr_date = active_sheet.cell(row=row, column=1).value
@@ -141,19 +143,24 @@ def calculate_one_month(active_sheet):
             if curr_date is None:
                 break
 
-            # if new week starts reset time and update week
             if curr_date.isocalendar()[1] != curr_week:
-                # time_tank = datetime.timedelta()
                 curr_week = curr_date.isocalendar()[1]
-                time_tank = active_sheet.cell(row=row, column=6).value
+                time_tank = datetime.timedelta()
 
-            elif datetime.timedelta(hours=2) <= time_tank <= datetime.timedelta(hours=8):
-                if curr_date.isocalendar()[1] == curr_week:
-                    active_sheet.cell(row=row, column=3).value = active_sheet.cell(row=row, column=2).value + time_tank
-                    time_tank += active_sheet.cell(row=row, column=6).value
-                    
-            elif time_tank < datetime.timedelta(hours=2):
+            # if new week starts reset time and update week
+
+            time_tank = active_sheet.cell(row=row, column=6).value
+
+            if time_tank == datetime.timedelta(hours=50):
                 active_sheet.cell(row=row, column=6).value = datetime.timedelta()
+                continue
+
+            elif time_tank >= datetime.timedelta(hours=20):
+                uy = active_sheet.cell(row=row, column=3).value
+                go_time = datetime.timedelta(hours=uy.hour, minutes=uy.minute, seconds=uy.second)
+                overlapping_time = time_tank - datetime.timedelta(hours=20)
+                active_sheet.cell(row=row, column=3).value = go_time - overlapping_time
+                time_tank = datetime.timedelta(hours=50)
 
     # add formulas again
     for row in range(4, 50):
@@ -161,10 +168,12 @@ def calculate_one_month(active_sheet):
         active_sheet.cell(row=row,
                           column=4).value = f'=IF(C{row}-B{row}>$H$4,"00:45",IF(C{row}-B{row}>$H$5,"00:30",IF(C{row}-B{row}<=$H$5,"00:00")))'
 
+    return curr_week, time_tank
+
 
 # loop through each sheet
 for index, sheet in enumerate(wb.worksheets):
-    calculate_one_month(sheet)
+    week_nr, week_time = calculate_one_month(sheet, week_nr, week_time)
     print(f"{index + 1} von {len(wb.worksheets)}: Done")
 
 wb.save(filename=file_name + "_fertig.xlsx")
