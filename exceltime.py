@@ -149,9 +149,9 @@ def calculate_one_month(active_sheet, curr_week, time_tank):
 
             # if new week starts reset time and update week
 
-            time_tank = active_sheet.cell(row=row, column=6).value
+            time_tank += active_sheet.cell(row=row, column=6).value
 
-            if time_tank == datetime.timedelta(hours=50):
+            if time_tank >= datetime.timedelta(hours=50):
                 active_sheet.cell(row=row, column=6).value = datetime.timedelta()
                 continue
 
