@@ -3,3 +3,4 @@ venv/
 .idea/
 Leistungsbericht.xlsx
 .vscode/
+.ionide/

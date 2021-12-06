@@ -17,7 +17,6 @@ let stone_symbol = "$"
 let wall_symbol = "#"
 let free_symbol = " "
 
-let mutable player_pos = (-1, -1)
 
 (*let find_postions (index:int) (line:string) =
     match line.Contains player_symbol with
@@ -27,7 +26,7 @@ let mutable player_pos = (-1, -1)
     match line.Contains goal_symbol with
     | true ->
         Seq.iteri (fun i x -> match x.ToString() = goal_symbol with
-                              | true -> targets <- Array.append targets [|(index, i)|]
+                              | true -> goals <- Array.append goals [|(index, i)|]
                               | false -> () ) line
     | false -> ()*)
 
@@ -39,43 +38,44 @@ let calcPositions index =
 
 let findPostions i x =
     match x.ToString() with
-    | "P" -> 
-        player_pos <- calcPositions i
-        -1
     | "." -> i
     | _ -> -1
 
 
-let targets = 
+let goals = 
     input_field
-    |> List.toArray
-    |> Array.reduce (+)
+    |> List.reduce (+)
     |> Seq.mapi findPostions
     |> Seq.filter (fun x -> x <> -1)
     |> Seq.map calcPositions
     |> Seq.toArray
 
 
+let player_pos = 
+    input_field
+    |> List.reduce (+)
+    |> Seq.findIndex (fun x -> x.ToString() = player_symbol)
+    |> calcPositions
 
 
-let field: char[,] = Array2D.init 6 9 (fun i1 i2 -> (input_field.[i1]).[i2])
+let field: char[,] = Array2D.init input_field.Length input_field.[0].Length (fun i1 i2 -> (input_field.[i1]).[i2])
 
-let mutable is_cheating = false
+//let mutable is_cheating = false
 
 let make_move (curr_pos: int*int) move =
     match move with
-    | "l" ->
-        let x, y = curr_pos
-        (x, y - 1)
-    | "r" ->
-        let x, y = curr_pos
-        (x, y + 1)
-    | "u" ->
-        let x, y = curr_pos
-        (x - 1, y)
-    | "d" ->
-        let x, y = curr_pos
-        (x + 1, y)
+    | x when x = "l" || x = "L" ->
+        let r, c = curr_pos
+        (r, c - 1)
+    | x when x = "r" || x = "R" ->
+        let r, c = curr_pos
+        (r, c + 1)
+    | x when x = "u" || x = "U" ->
+        let r, c = curr_pos
+        (r - 1, c)
+    | x when x = "d" || x = "D" ->
+        let r, c = curr_pos
+        (r + 1, c)
     | _ -> (-1, -1)
 
 let eval_move (curr_field: string[,]) curr_move (pos: int*int) =
@@ -105,7 +105,7 @@ let operation curr_field curr_pos curr_move =
 
     let new_pos = make_move curr_pos curr_move
     match new_pos with
-    | (a, b ) when a < 0 || b < 0 -> failwith "is Cheating" //is_cheating <- true
+    | (a, b) when a < 0 || b < 0 -> failwith "is Cheating" //is_cheating <- true
     | _ -> ()
 
     let stone_or_next_pos = eval_move curr_field curr_move new_pos
@@ -137,27 +137,36 @@ let check_is_finished goal_pos my_field =
 
 let rec play game_field pos move_list =
     match move_list with
-    | 
+    | [] -> 
+        Array.iter (fun x -> check_is_finished x game_field) goals
+        false
+    | head :: tail ->
+        let new_game_field, new_player_pos = operation game_field pos head
+        //if is_cheating then failwith "You cheated"
+        Array.iter (fun x -> set_goals x game_field) goals
+        play new_game_field new_player_pos tail
 
 
-let workflow() =
+// let workflow() =
 
-    let mutable game_field = field |> Array2D.map string
+//     let mutable game_field = field |> Array2D.map string
 
-    for move in moves do
-        printfn "%A" game_field
-        printfn "%s" "______________________________________________" 
-        let m, n = operation game_field player_pos move
-        if is_cheating then failwith "You cheated"
-        game_field <- m
-        //game_field <- Array.iter (f)
-        Array.iter (fun x -> set_goals x game_field) targets
-        player_pos <- n
-
-
-    Array.iter (fun x -> check_is_finished x game_field) targets
-
-    is_cheating
+//     for move in moves do
+//         printfn "%A" game_field
+//         printfn "%s" "______________________________________________" 
+//         let m, n = operation game_field player_pos move
+//         if is_cheating then failwith "You cheated"
+//         game_field <- m
+//         //game_field <- Array.iter (f)
+//         Array.iter (fun x -> set_goals x game_field) goals
+//         player_pos <- n
 
 
-printfn "hei there: %A" (workflow())
+//     Array.iter (fun x -> check_is_finished x game_field) goals
+
+//     is_cheating
+
+
+// printfn "hei there: %A" (workflow())
+
+play (field |> Array2D.map string) player_pos moves |> printfn "cheating: %b"
