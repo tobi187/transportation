@@ -93,15 +93,7 @@ let eval_move (curr_field: string[,]) curr_move (pos: int*int) =
     | _ -> (-1, -1)
 
 
-let set_goals goal_pos curr_field =
-    let row, col = goal_pos
-    match (Array2D.get curr_field row col).ToString() with
-    | a when a = stone_symbol || a = player_symbol || a = goal_symbol -> ()
-    | _ -> Array2D.set curr_field row col goal_symbol
-
 let operation curr_field curr_pos curr_move =
-    //printfn "%A" curr_field
-    
 
     let new_pos = make_move curr_pos curr_move
     match new_pos with
@@ -128,6 +120,13 @@ let operation curr_field curr_pos curr_move =
     (curr_field, new_pos)
 
 
+let set_goals goal_pos curr_field =
+    let row, col = goal_pos
+    match (Array2D.get curr_field row col).ToString() with
+    | a when a = stone_symbol || a = player_symbol || a = goal_symbol -> ()
+    | _ -> Array2D.set curr_field row col goal_symbol
+
+
 let check_is_finished goal_pos my_field =
     let row, col = goal_pos
     match (Array2D.get my_field row col).ToString() = stone_symbol with
@@ -138,11 +137,14 @@ let check_is_finished goal_pos my_field =
 let rec play game_field pos move_list =
     match move_list with
     | [] -> 
+        //check if both goals are covered by Stones
         Array.iter (fun x -> check_is_finished x game_field) goals
         false
     | head :: tail ->
+        // plays move and checks throws error if move is not valid, returns field after move and player position after move
         let new_game_field, new_player_pos = operation game_field pos head
         //if is_cheating then failwith "You cheated"
+        // if postions of goals are empty set goal on it
         Array.iter (fun x -> set_goals x game_field) goals
         play new_game_field new_player_pos tail
 
@@ -168,5 +170,3 @@ let rec play game_field pos move_list =
 
 
 // printfn "hei there: %A" (workflow())
-
-play (field |> Array2D.map string) player_pos moves |> printfn "cheating: %b"
