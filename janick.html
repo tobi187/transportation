@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+
+    <div id="app">
+        <home-view v-bind:dv="dv1"></home-view>
+        <reservation-view v-bind:dv="dv2"></reservation-view>
+        <other-view v-bind:dv="dv3"></other-view>
+
+        <div>
+            <button @click="showHome">Home</button>
+            <button @click="showReservation">Reservatio</button>
+            <button @click="showOther">Andere</button>
+        </div>
+    </div>
+
+</body>
+
+</html>
+
+<script type="text/javascript">
+    Vue.component('home-view', {
+        data: function () {
+            return {
+                count: 0,
+                name: "Home"
+            }
+        },
+        props: ["dv"],
+        template: '<div v-bind:style="{ display: dv }"><h1>{{ name }}</h1></div>'
+    })
+    Vue.component('reservation-view', {
+        data: function () {
+            return {
+                count: 0,
+                name: "Reservation"
+            }
+        },
+        props: ["dv"],
+        template: '<div v-bind:style="{ display: dv }"><h1>{{ name }}</h1></div>'
+    })
+    Vue.component('other-view', {
+        data: function () {
+            return {
+                count: 0,
+                name: "Other"
+            }
+        },
+        props: ["dv"],
+        template: '<div v-bind:style="{ display: dv }"><h1>{{ name }}</h1></div>'
+    })
+    var app = new Vue({
+        el: "#app",
+        data: {
+            dv1: "block",
+            dv2: "none",
+            dv3: "none"
+        },
+        methods: {
+            setFalse: function () {
+                this.dv1 = "none"
+                this.dv2 = "none"
+                this.dv3 = "none"
+            },
+            showHome: function () {
+                this.setFalse()
+                this.dv1 = "block"
+            },
+            showReservation: function () {
+                this.setFalse()
+                this.dv2 = "block"
+            },
+            showOther: function () {
+                this.setFalse()
+                this.dv3 = "block"
+            }
+        }
+    })
+</script>
